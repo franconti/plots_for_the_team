@@ -1,0 +1,39 @@
+#Code to import data from a google docnfile to google colab. 
+ 
+
+#from google.colab import auth
+auth.authenticate_user()
+
+import gspread
+from google.auth import default
+creds, _ = default()
+
+gc = gspread.authorize(creds)
+
+#HERE GOES THE FILE NAME!!!
+worksheet = gc.open('FILE_NAME').worksheet('WORKSHEET_NAME')
+
+# get_all_values gives a list of rows.
+rows = worksheet.get_all_values()
+print(rows)
+
+# Convert to a DataFrame and render.
+
+analyt = pd.DataFrame.from_records(rows)
+
+#set row 0 as header
+analyt.columns = analyt.iloc[0]
+
+#erase first row
+analyt = analyt.drop(0)
+
+# Convert all columns to numeric
+data = analyt.apply(pd.to_numeric, errors="ignore")
+
+
+
+
+
+
+
+
