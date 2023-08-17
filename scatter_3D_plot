@@ -1,0 +1,18 @@
+#using the data set from upload_data_colab, import the libraries and run the codes!
+
+######################
+#import libraries
+import plotly.express as px
+import pandas as pd
+
+######################
+#interactive 2D plot
+
+px.scatter(data, x='variable_x)', y='variable_y', color='Type')
+
+######################
+#interactive 3D plot
+fig = px.scatter_3d(data, x='variable_x', y='variable_y', z='variable_z',
+              color='Type', hover_name='Name_here')
+              
+fig.show()
