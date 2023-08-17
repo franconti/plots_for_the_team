@@ -1,0 +1,121 @@
+# Code for fitting data to an exponential plateau (S-shaped curve).
+# Import the data using upload_data_colab. Then, set the columns to be plotted on the X and Y axes. 
+#Finally, begin plotting!
+
+
+######################
+#import libraries
+
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.optimize import curve_fit
+import pandas as pd
+
+
+######################
+#SET THE VARIABLES YOU WANT TO PLOT. 
+#write the columns of the data set in " "
+
+variable_x = "Column_A"
+variable_y = "Column_B"
+type_experiment = ""Column_C"
+
+
+
+######################
+#defining exponential plateau function
+
+def exponential_plateau_func(x, A, k, C):
+    return A * (1 - np.exp(-k * x)) + C
+
+
+
+#fitting data to equation
+
+def fit_data_to_exponential_plateau(x, y):
+    # Ensure data is in numpy arrays
+    x_data = np.array(x)
+    y_data = np.array(y)
+
+    # Perform curve fitting
+    popt, _ = curve_fit(exponential_plateau_func, x_data, y_data)
+
+    # Extract the fitted parameters
+    A_fit, k_fit, C_fit = popt
+
+    return A_fit, k_fit, C_fit
+
+
+# Load your data into a pandas DataFrame
+data = {
+    'X': data[variable_x],
+    'Y': data[variable_x],
+    'type': analyt[type_experiment]
+}
+
+df = pd.DataFrame(data)
+
+# Group the data by the "type" column
+grouped = df.groupby('type')
+
+# Dictionary to store fitted parameters for each type
+fitted_params = {}
+
+# Create a list to store the handles of plotted curves
+handles = []
+
+def fit_data_to_exponential_plateau(x, y):
+    # Ensure data is in numpy arrays
+    x_data = np.array(x)
+    y_data = np.array(y)
+
+    # Perform curve fitting
+    popt, _ = curve_fit(exponential_plateau_func, x_data, y_data)
+
+    # Extract the fitted parameters
+    A_fit, k_fit, C_fit = popt
+
+    return A_fit, k_fit, C_fit
+
+
+def plot_data_and_fit(x, y, x_fit, y_fit, color='blue', label=None):
+    plt.scatter(x, y, label='Data Points', color=color)
+    plt.plot(x_fit, y_fit, label=label, color=color)
+    plt.xlabel('x')
+    plt.ylabel('y')
+    plt.grid()
+
+
+
+# Iterate through the groups and plot each curve
+plt.figure()
+
+for name, group in grouped:
+    x_data = group['X'].tolist()
+    y_data = group['Y'].tolist()
+
+    A_fit, k_fit, C_fit = fit_data_to_exponential_plateau(x_data, y_data)
+    x_fit = np.linspace(min(x_data), max(x_data), 100)
+    y_fit = exponential_plateau_func(x_fit, A_fit, k_fit, C_fit)
+
+    color = np.random.rand(3,)
+    plot_data_and_fit(x_data, y_data, x_fit, y_fit, color=color, label=f'Type {name}')
+
+    # Store fitted parameters in the dictionary
+    fitted_params[name] = {'A': A_fit, 'k': k_fit, 'C': C_fit}
+
+    # Store the handle of the plotted curve for the legend
+    handles.append(plt.Line2D([0], [0], color=color, label=f'Type {name}'))
+
+plt.xlabel('x')
+plt.ylabel('y')
+plt.grid()
+
+# Place the legend outside the frame
+plt.legend(handles=handles, loc='center left', bbox_to_anchor=(1, 0.5))
+
+plt.show()
+
+# Print the fitted parameters
+for name, params in fitted_params.items():
+    print(f"Type {name}: A = {params['A']}, k = {params['k']}, C = {params['C']}")
