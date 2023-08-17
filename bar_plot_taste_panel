@@ -1,0 +1,41 @@
+"""This code was created to assist in plotting the results of taste panel sessions. 
+Within the company, numerous tasting panels were conducted to compare different products. 
+During these panels, customers were required to rank the likelihood of enjoying various products on a scale from 1 to 9. 
+The primary purpose of this plot is to categorize the votes into three distinct groups ("1-3", "4-6", "7-9") and subsequently compare 
+which products were the most favored.
+"""
+
+#import data from upload_data_colab
+
+######################
+#import libraries
+
+import plotly.express as px
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+
+
+df = data
+
+# Group data by "Sample Number" and "OVERALL LIKING"
+grouped = df.groupby(["Sample Number", "OVERALL LIKING"]).size().reset_index(name="count")
+
+# Define the custom x-axis divisions and labels
+xticks = np.arange(1, 10, 3)
+xtick_labels = ["1-3", "4-6", "7-9"]
+
+# Create a bar plot with custom x-axis divisions and grouping
+plt.figure(figsize=(10, 6))
+for i, group_num in enumerate(grouped["Sample Number"].unique()):
+    group_data = grouped[grouped["Sample Number"] == group_num]
+    counts = [group_data[group_data["OVERALL LIKING"].between(x_range[0], x_range[1])]["count"].sum() for x_range in [(1, 3), (4, 6), (7, 9)]]
+
+    plt.bar(xticks + i * 0.8 / len(grouped["Sample Number"].unique()), counts, width=0.8 / len(grouped["Sample Number"].unique()), label=f"Group {group_num}")
+
+plt.xlabel("OVERALL LIKING")
+plt.ylabel("Number of People")
+plt.title("Distribution of LIKING scores")
+plt.legend()
+plt.xticks(xticks, xtick_labels)
+plt.show()
