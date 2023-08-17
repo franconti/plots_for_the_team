@@ -16,6 +16,35 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
+###################### 1
+#To determine which product received the highest likelihood score from each individual.
+
+# Group the data by each taster. Each one has different email so this is the strategy to do it
+grouped_data = data.groupby("Email Address")
+
+
+# Initialize an empty DataFrame to store the results
+results = pd.DataFrame(columns=["max_like", "favorite_product"])
+
+# Iterate through each group
+for name, group in grouped_data:
+    max_like = group["OVERALL LIKING"].max()  # Find the maximum value in the "like" column
+    favorite_product = group.loc[group["OVERALL LIKING"].idxmax()]["Sample Number"]  # Find the corresponding product
+
+    results = results.append({ "max_like": max_like, "favorite_product": favorite_product}, ignore_index=True)
+
+# Display the results
+unique_count = results['favorite_product'].value_counts()
+
+# Display the unique count
+print(unique_count)
+
+
+
+
+
+###################### 2
+# To plot the distribution of liklihood
 df = data
 
 # Group data by "Sample Number" and "OVERALL LIKING"
@@ -39,3 +68,7 @@ plt.title("Distribution of LIKING scores")
 plt.legend()
 plt.xticks(xticks, xtick_labels)
 plt.show()
+
+
+
+
