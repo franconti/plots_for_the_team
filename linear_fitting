@@ -1,0 +1,106 @@
+# Code for linerar fitting .
+# Import the data using upload_data_colab. 
+#Then, set the columns to be plotted on the X and Y axes. Select de part of data set to be plot by setting x_min value.
+
+#Finally, begin plotting!
+
+######################
+#import libraries
+
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.optimize import curve_fit
+import pandas as pd
+
+
+######################
+#SET THE VARIABLES YOU WANT TO PLOT. 
+#write the columns of the data set in " "
+
+variable_x = "Column_A"
+variable_y = "Column_B"
+type_experiment = ""Column_C"
+
+#put here the number where you want to start ploting, it will select the poits equeal or biger than
+x_min = 60
+
+
+######################
+# Define the linear function
+def linear_func(x, m, b):
+    return m * x + b
+
+# Function to fit data to a linear model
+def fit_data_to_linear(x, y):
+    # Ensure data is in numpy arrays
+    x_data = np.array(x)
+    y_data = np.array(y)
+
+    # Perform curve fitting
+    popt, _ = curve_fit(linear_func, x_data, y_data)
+
+    # Extract the fitted parameters
+    m_fit, b_fit = popt
+
+    # Calculate R-squared value
+    residuals = y_data - linear_func(x_data, m_fit, b_fit)
+    ss_res = np.sum(residuals**2)
+    ss_tot = np.sum((y_data - np.mean(y_data))**2)
+    r_squared = 1 - (ss_res / ss_tot)
+
+    return m_fit, b_fit, r_squared
+
+# Load your data into a pandas DataFrame
+data = {
+    'X': data[variable_x],
+    'Y': data[variable_y],
+    'type': data[type_experiment]
+}
+
+df = pd.DataFrame(data)
+
+# Group the data by the "type" column
+grouped = df.groupby('type')
+
+# Dictionary to store fitted parameters for each type
+fitted_params = {}
+
+# Create a list to store the handles of plotted curves
+handles = []
+
+# Iterate through the groups and plot each curve
+plt.figure()
+
+for name, group in grouped:
+    x_data = group[group['X'] >= x_min]['X'].tolist()  # Select points >= a
+    y_data = group[group['X'] >= x_min]['Y'].tolist()
+
+    m_fit, b_fit, r_squared = fit_data_to_linear(x_data, y_data)
+    x_fit = np.linspace(min(x_data), max(x_data), 100)
+    y_fit = linear_func(x_fit, m_fit, b_fit)
+
+    color = np.random.rand(3,)
+    plt.scatter(x_data, y_data, label=f'Data Points - Type {name}', color=color)
+    plt.plot(x_fit, y_fit, label=f'Linear Fit - Type {name}', color=color)
+    plt.xlabel('x')
+    plt.ylabel('y')
+    plt.grid()
+
+    # Store fitted parameters and R-squared value in the dictionary
+    fitted_params[name] = {'m': m_fit, 'b': b_fit, 'r_squared': r_squared}
+
+    # Store the handle of the plotted curve for the legend
+    handles.append(plt.Line2D([0], [0], color=color, label=f'Type {name}'))
+
+plt.xlabel('x')
+plt.ylabel('y')
+plt.grid()
+
+# Place the legend outside the frame
+plt.legend(handles=handles, loc='center left', bbox_to_anchor=(1, 0.5))
+
+plt.show()
+
+# Print the fitted parameters and R-squared values
+for name, params in fitted_params.items():
+    print(f"Type {name}: Slope (m) = {params['m']}, Intercept (b) = {params['b']}, R-squared = {params['r_squared']}")
